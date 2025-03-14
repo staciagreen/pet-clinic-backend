@@ -1,6 +1,7 @@
-package Banking.Commands;
+package Banking.Commands.ClientOperations;
 
 import Banking.Client;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
 public class AddPassportCommand implements Command {

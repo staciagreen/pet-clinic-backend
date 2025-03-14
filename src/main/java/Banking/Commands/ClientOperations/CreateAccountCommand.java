@@ -1,4 +1,4 @@
-package Banking.Commands;
+package Banking.Commands.ClientOperations;
 
 import Banking.Bank;
 import Banking.Accounts.Account;
@@ -6,6 +6,7 @@ import Banking.Accounts.CreditAccount;
 import Banking.Accounts.DebitAccount;
 import Banking.Accounts.DepositAccount;
 import Banking.Client;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
 public class CreateAccountCommand implements Command {

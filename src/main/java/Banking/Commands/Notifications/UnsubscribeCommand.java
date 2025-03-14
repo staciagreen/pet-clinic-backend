@@ -1,7 +1,8 @@
-package Banking.Commands;
+package Banking.Commands.Notifications;
 
 import Banking.Bank;
 import Banking.Client;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
 public class UnsubscribeCommand implements Command {

@@ -1,7 +1,8 @@
-package Banking.Parsing;
+package Banking.Parsing.BankOperations;
 
-import Banking.Commands.TimeSkipCommand;
+import Banking.Commands.BankOperations.TimeSkipCommand;
 import Banking.Commands.Command;
+import Banking.Parsing.CommandHandlerBase;
 
 public class TimeSkipCommandHandler extends CommandHandlerBase {
     @Override

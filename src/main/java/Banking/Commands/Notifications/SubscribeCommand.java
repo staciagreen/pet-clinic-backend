@@ -1,15 +1,16 @@
-package Banking.Commands;
+package Banking.Commands.Notifications;
 
 
 import Banking.Bank;
 import Banking.Client;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
-public class NotificationSubscribtionCommand implements Command {
+public class SubscribeCommand implements Command {
     private final Client client;
     private final Bank bank;
 
-    public NotificationSubscribtionCommand(Client client, Bank bank) {
+    public SubscribeCommand(Client client, Bank bank) {
         this.client = client;
         this.bank = bank;
     }

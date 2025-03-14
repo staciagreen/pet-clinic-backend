@@ -1,3 +1,8 @@
+import Banking.Commands.BankOperations.*;
+import Banking.Commands.ClientOperations.AddAddressCommand;
+import Banking.Commands.ClientOperations.AddPassportCommand;
+import Banking.Commands.ClientOperations.CreateClientCommand;
+import Banking.Commands.Notifications.UnsubscribeCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,53 +14,41 @@ import Banking.Bank;
 import Banking.CentralBank;
 import Banking.Client;
 import Banking.Accounts.*;
-import Banking.History.OperationHistory;
-import Banking.Printers.IPrinter;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;o
-import java.util.ArrayList;
 
-public ParserTest {
+public class ParserTest {
 
     private Bank bank;
     private Client client;
-    private CentralBank centralBank;
-    private TestPrinter testPrinter;
+    private PrinterTest testPrinter;
     private Parser parser;
 
     @BeforeEach
-    public void setup () {
-        // Получаем экземпляр Центрального банка
-        centralBank = CentralBank.getInstance();
-        // Для тестирования желательно очистить списки банков и счетов (если такой функционал отсутствует – убедитесь, что тесты выполняются на чистом экземпляре)
-        // Создаём банк
+    public void setup() {
+        CentralBank centralBank = CentralBank.getInstance();
+        centralBank.clearAllBanks();
         bank = new Bank("BankA", BigDecimal.valueOf(0.03), BigDecimal.valueOf(10),
                 BigDecimal.valueOf(5000), BigDecimal.valueOf(1000));
         centralBank.registerBank(bank);
-        // Создаём клиента (для большинства тестов)
         client = new Client.ClientBuilder("John", "Doe")
                 .withAddress("123 Main Street")
                 .withPassport("AB123456")
                 .build();
         bank.addClient(client);
-        // Инициализируем тестовый принтер и парсер
-        testPrinter = new TestPrinter();
+        testPrinter = new PrinterTest();
         parser = new Parser();
     }
 
-    // 1. Тест парсинга команды создания клиента через Matcher,
-    //    где адрес и паспорт располагаются в конце команды.
     @Test
-    public void testCreateClientCommandParsing () {
+    public void test1CreateClientCommandParsing() {
         String input = "create client Alice Smith -address 456 Elm Street Apt 7 -passport PS987654 BankA";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof CreateClientCommand);
+        assertInstanceOf(CreateClientCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        // Проверяем, что вывод содержит информацию о созданном клиенте и указанных параметрах
         assertTrue(messages.get(0).contains("Client created: Alice Smith"));
         assertTrue(messages.get(1).contains("With passport: PS987654"));
         assertTrue(messages.get(2).contains("With address: 456 Elm Street Apt 7"));
@@ -63,68 +56,65 @@ public ParserTest {
 
     // 2. Тест парсинга команды изменения условий банка
     @Test
-    public void testChangeBankConditionsCommandParsing () {
+    public void test2ChangeBankConditionsCommandParsing() {
         String input = "setconditions BankA -interest 0.05 -creditCommission 15 -transferLimit 2000 -creditLimit 6000";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof ChangeBankConditionsCommand);
+        assertInstanceOf(ChangeBankConditionsCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("Bank conditions updated for bank BankA"));
+        assertTrue(messages.getFirst().contains("Bank conditions updated for bank BankA"));
     }
 
-    // 3. Тест парсинга команды отписки от уведомлений
     @Test
-    public void testUnsubscribeCommandParsing () {
-        // Для теста создаём клиента с односоставным именем (так как хендлер разделяет по пробелу)
+    public void test3UnsubscribeCommandParsing() {
         Client simpleClient = new Client.ClientBuilder("JohnDoe", "Doe").build();
         bank.addClient(simpleClient);
         bank.addObserver(simpleClient); // подписываем клиента
         String input = "unsubscribe JohnDoe BankA";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof UnsubscribeCommand);
+        assertInstanceOf(UnsubscribeCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("unsubscribed from notifications"));
+        assertTrue(messages.getFirst().contains("unsubscribed from notifications"));
     }
 
     // 4. Тест команды депозита (парсинг и выполнение)
     @Test
-    public void testDepositCommandParsingAndExecution () {
+    public void test4DepositCommandParsingAndExecution() {
         // Создаём дебетовый счет для клиента
         DebitAccount debitAccount = new DebitAccount(client, bank);
         bank.addAccount(debitAccount);
         String input = "deposit " + debitAccount.getId().toString() + " 500";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof DepositCommand);
+        assertInstanceOf(DepositCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("Deposit of 500"));
+        assertTrue(messages.getFirst().contains("Deposit of 500"));
         assertEquals(BigDecimal.valueOf(500), debitAccount.getBalance());
     }
 
     // 5. Тест команды снятия средств
     @Test
-    public void testWithdrawCommandParsingAndExecution () {
+    public void test5WithdrawCommandParsingAndExecution() {
         DebitAccount debitAccount = new DebitAccount(client, bank);
         bank.addAccount(debitAccount);
-        // Предварительно пополняем счет
         debitAccount.deposit(BigDecimal.valueOf(1000));
         String input = "withdraw " + debitAccount.getId().toString() + " 300";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof WithdrawCommand);
+        assertInstanceOf(WithdrawCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("Withdrawn 300"));
+        assertTrue(messages.getFirst().contains("Withdrawn 300"));
         assertEquals(BigDecimal.valueOf(700), debitAccount.getBalance());
     }
 
     // 6. Тест команды перевода между счетами
     @Test
-    public void testTransferCommandParsingAndExecution () {
+    public void test6TransferCommandParsingAndExecution() {
         DebitAccount sender = new DebitAccount(client, bank);
         DebitAccount receiver = new DebitAccount(client, bank);
         bank.addAccount(sender);
@@ -133,59 +123,57 @@ public ParserTest {
         String input = "transfer " + sender.getId().toString() + " " + receiver.getId().toString() + " 400";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof TransferCommand);
+        assertInstanceOf(TransferCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("Transferred 400"));
+        assertTrue(messages.getFirst().contains("Transferred 400"));
         assertEquals(BigDecimal.valueOf(600), sender.getBalance());
         assertEquals(BigDecimal.valueOf(400), receiver.getBalance());
     }
 
     // 7. Тест команды обновления адреса
     @Test
-    public void testAddAddressCommandParsingAndExecution () {
-        // Для теста создаём клиента с односоставным именем (требование хендлера)
-        Client simpleClient = new Client.ClientBuilder("JohnDoe", "Doe").build();
+    public void testAddAddressCommandParsingAndExecution() {
+        Client simpleClient = new Client.ClientBuilder("Mary", "Doe").build();
         bank.addClient(simpleClient);
-        String input = "setaddress JohnDoe BankA UpdatedAddress";
+        String input = "setaddress MaryDoe BankA UpdatedAddress";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof AddAddressCommand);
+        assertInstanceOf(AddAddressCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("Address updated for client"));
+        assertTrue(messages.getFirst().contains("Address updated for client"));
         assertEquals("UpdatedAddress", simpleClient.getAddress());
     }
 
     // 8. Тест команды обновления паспорта
     @Test
-    public void testAddPassportCommandParsingAndExecution () {
-        Client simpleClient = new Client.ClientBuilder("JohnDoe", "Doe").build();
+    public void test8AddPassportCommandParsingAndExecution() {
+        Client simpleClient = new Client.ClientBuilder("Stacia", "Doe").build();
         bank.addClient(simpleClient);
-        String input = "setpassport JohnDoe BankA NewPassport123";
+        String input = "setpassport StaciaDoe BankA NewPassport123";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof AddPassportCommand);
+        assertInstanceOf(AddPassportCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("Passport updated for client"));
+        assertTrue(messages.getFirst().contains("Passport updated for client"));
         assertEquals("NewPassport123", simpleClient.getPassport());
     }
 
-// 9. Тест команды ускорения времени (TimeSkip)
+    // 9. Тест команды ускорения времени (TimeSkip)
     @Test
-    public void testTimeSkipCommandParsingAndExecution () {
+    public void test9TimeSkipCommandParsingAndExecution() {
         DebitAccount debitAccount = new DebitAccount(client, bank);
         bank.addAccount(debitAccount);
         debitAccount.deposit(BigDecimal.valueOf(1000));
         String input = "time skip 5";
         Command command = parser.parse(input);
         assertNotNull(command);
-        assertTrue(command instanceof TimeSkipCommand);
+        assertInstanceOf(TimeSkipCommand.class, command);
         command.execute(testPrinter);
         List<String> messages = testPrinter.getMessages();
-        assertTrue(messages.get(0).contains("Time skipped by 5 day(s)."));
-        // Проверяем, что за 5 дней начислены проценты (с допуском на округление)
+        assertTrue(messages.getFirst().contains("Time skipped by 5 day(s)."));
         BigDecimal dailyRate = BigDecimal.valueOf(0.03).divide(BigDecimal.valueOf(365), 10, BigDecimal.ROUND_HALF_UP);
         BigDecimal expectedDailyInterest = BigDecimal.valueOf(1000).multiply(dailyRate);
         BigDecimal expectedBalance = BigDecimal.valueOf(1000).add(expectedDailyInterest.multiply(BigDecimal.valueOf(5)));
@@ -194,34 +182,19 @@ public ParserTest {
 
     // 10. Тест отмены транзакции с использованием паттерна "Снимок"
     @Test
-    public void testCancelTransactionCommand () {
+    public void test10CancelTransactionCommand() {
         DebitAccount debitAccount = new DebitAccount(client, bank);
         bank.addAccount(debitAccount);
         debitAccount.deposit(BigDecimal.valueOf(1000));
-        // Выполняем команду снятия с сохранением снимка
         String withdrawInput = "withdraw " + debitAccount.getId().toString() + " 200";
         Command withdrawCommand = parser.parse(withdrawInput);
         withdrawCommand.execute(testPrinter);
         BigDecimal balanceAfterWithdraw = debitAccount.getBalance();
         assertEquals(BigDecimal.valueOf(800), balanceAfterWithdraw);
-        // Выполняем команду отмены последней операции
         Command cancelCommand = new CancelTransactionCommand();
         cancelCommand.execute(testPrinter);
-        // После отмены баланс должен восстановиться до 1000
         assertEquals(BigDecimal.valueOf(1000), debitAccount.getBalance());
     }
 }
 
-// Простой тестовый принтер для сбора выводимых сообщений
-class TestPrinter implements IPrinter {
-    private final List<String> messages = new ArrayList<>();
 
-    @Override
-    public void print(String message) {
-        messages.add(message);
-    }
-
-    public List<String> getMessages() {
-        return messages;
-    }
-}

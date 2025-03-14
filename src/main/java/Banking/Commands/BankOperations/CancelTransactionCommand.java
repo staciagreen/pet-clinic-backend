@@ -1,8 +1,9 @@
-package Banking.Commands;
+package Banking.Commands.BankOperations;
 
 import Banking.Accounts.Account;
 import Banking.Accounts.AccountSnapshot;
 import Banking.CentralBank;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
 public class CancelTransactionCommand implements Command {
@@ -10,7 +11,7 @@ public class CancelTransactionCommand implements Command {
     public void execute(IPrinter printer) {
         AccountSnapshot snapshot = CentralBank.getInstance().getOperationHistory().undo();
         if (snapshot != null) {
-            Account account = CentralBank.getInstance().findAccountByID(snapshot.getAccountId());
+            Account account = CentralBank.getInstance().findAccountByID(snapshot.accountId());
             if (account != null) {
                 account.restoreSnapshot(snapshot);
                 printer.print("Operation undone for account " + account.getId() +

@@ -15,9 +15,7 @@ public class DepositAccount implements Account {
     private final Client owner;
     private AccountState state;
     private BigDecimal balance;
-    private final List<Command> transactionHistory;
     private final Bank bank;
-    private final String accountTypeName = "deposit";
     private final DepositInterestStrategy interestStrategy;
 
     public DepositAccount(Client owner, Bank bank) {
@@ -25,7 +23,7 @@ public class DepositAccount implements Account {
         this.owner = owner;
         this.bank = bank;
         this.balance = BigDecimal.ZERO;
-        this.transactionHistory = new ArrayList<>();
+        List<Command> transactionHistory = new ArrayList<>();
         this.state = owner.hasFullInfo() ? new AccountState.ActiveState() : new AccountState.SuspiciousState();
         owner.addAccount(this);
         this.interestStrategy = new DepositInterestStrategy();
@@ -39,6 +37,17 @@ public class DepositAccount implements Account {
     @Override
     public void withdraw(BigDecimal amount) {
         throw new UnsupportedOperationException("Снятие с депозитного счета запрещено до окончания срока.");
+    }
+
+    @Override
+    public AccountSnapshot createSnapshot() {
+        return new AccountSnapshot(this.id, this.balance, this.state);
+    }
+
+    @Override
+    public void restoreSnapshot(AccountSnapshot snapshot) {
+        this.balance = snapshot.balance();
+        this.state = snapshot.state();
     }
 
     public void accrueDailyInterest() {
@@ -68,7 +77,7 @@ public class DepositAccount implements Account {
 
     @Override
     public String getAccountTypeName() {
-        return accountTypeName;
+        return "deposit";
     }
 
     @Override
@@ -78,6 +87,8 @@ public class DepositAccount implements Account {
 
     @Override
     public void update(String message) {
-        // При необходимости обновить состояние
+        if (owner.hasFullInfo()) {
+            state = new AccountState.ActiveState();
+        }
     }
 }

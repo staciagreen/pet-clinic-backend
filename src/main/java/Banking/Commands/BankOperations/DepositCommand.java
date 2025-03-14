@@ -1,11 +1,10 @@
-package Banking.Commands;
+package Banking.Commands.BankOperations;
 
 import Banking.Accounts.Account;
-import Banking.Client;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public class DepositCommand implements Command {
     private final Account account;

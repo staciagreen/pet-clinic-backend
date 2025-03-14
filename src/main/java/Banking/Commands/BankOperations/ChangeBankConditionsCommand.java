@@ -1,6 +1,7 @@
-package Banking.Commands;
+package Banking.Commands.BankOperations;
 
 import Banking.Bank;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
 import java.math.BigDecimal;
@@ -26,8 +27,7 @@ public class ChangeBankConditionsCommand implements Command {
         bank.setInterestRate(newInterestRate);
         bank.setCreditCommission(newCreditCommission);
         bank.setTransferLimit(newTransferLimit);
-        // Если требуется, можно добавить setter для кредитного лимита:
-        // bank.setCreditLimit(newCreditLimit);
+        bank.setCreditLimit(newCreditLimit);
         printer.print("Bank conditions updated for bank " + bank.getName() +
                 ": interest rate = " + newInterestRate +
                 ", credit commission = " + newCreditCommission +

@@ -1,6 +1,7 @@
-package Banking.Commands;
+package Banking.Commands.BankOperations;
 
 import Banking.Accounts.Account;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 import Banking.CentralBank;
 
@@ -18,7 +19,6 @@ public class WithdrawCommand implements Command {
     @Override
     public void execute(IPrinter printer) {
         try {
-            // Сохраняем снимок состояния до выполнения операции
             CentralBank.getInstance().getOperationHistory().addSnapshot(account.createSnapshot());
             account.withdraw(amount);
             printer.print("Withdrawn " + amount + " from account " + account.getId() +

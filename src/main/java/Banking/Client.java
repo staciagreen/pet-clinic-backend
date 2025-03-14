@@ -35,14 +35,6 @@ public class Client extends ObservableEntity implements Observer {
         accounts.remove(account);
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
     public String GetFullName() {
         return firstName + " " + lastName;
     }
@@ -56,7 +48,7 @@ public class Client extends ObservableEntity implements Observer {
     }
 
     public String getName() {
-        return firstName + " " + lastName;
+        return firstName + lastName;
     }
 
     public void SetAddress(String address) {

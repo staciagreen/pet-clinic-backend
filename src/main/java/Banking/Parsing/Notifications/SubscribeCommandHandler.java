@@ -1,12 +1,13 @@
-package Banking.Parsing;
+package Banking.Parsing.Notifications;
 
 import Banking.Bank;
 import Banking.CentralBank;
 import Banking.Client;
 import Banking.Commands.Command;
-import Banking.Commands.NotificationSubscribtionCommand;
+import Banking.Commands.Notifications.SubscribeCommand;
+import Banking.Parsing.CommandHandlerBase;
 
-public class NotificationSubscribtionCommandHandler extends CommandHandlerBase {
+public class SubscribeCommandHandler extends CommandHandlerBase {
     public Command handle(String input) {
         // Формат: subscribe <clientName> <bankName>
         String[] parts = input.split(" ");
@@ -17,7 +18,7 @@ public class NotificationSubscribtionCommandHandler extends CommandHandlerBase {
             if (bank != null) {
                 Client client = bank.findClientByName(clientName);
                 if (client != null) {
-                    return new NotificationSubscribtionCommand(client, bank);
+                    return new SubscribeCommand(client, bank);
                 }
             }
         }

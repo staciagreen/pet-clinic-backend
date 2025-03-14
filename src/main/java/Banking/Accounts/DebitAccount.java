@@ -15,9 +15,7 @@ public class DebitAccount implements Account {
     private final Client owner;
     private AccountState state;
     private BigDecimal balance;
-    private final List<Command> transactionHistory;
     private final Bank bank;
-    private final String accountTypeName = "debit";
     private final DebitInterestStrategy interestStrategy;
 
     public DebitAccount(Client owner, Bank bank) {
@@ -25,7 +23,7 @@ public class DebitAccount implements Account {
         this.owner = owner;
         this.bank = bank;
         this.balance = BigDecimal.ZERO;
-        this.transactionHistory = new ArrayList<>();
+        List<Command> transactionHistory = new ArrayList<>();
         this.state = owner.hasFullInfo() ? new AccountState.ActiveState() : new AccountState.SuspiciousState();
         owner.addAccount(this);
         this.interestStrategy = new DebitInterestStrategy(bank.getInterestRate());
@@ -56,8 +54,8 @@ public class DebitAccount implements Account {
 
     // Метод восстановления состояния счета из снимка
     public void restoreSnapshot(AccountSnapshot snapshot) {
-        this.balance = snapshot.getBalance();
-        this.state = snapshot.getState();
+        this.balance = snapshot.balance();
+        this.state = snapshot.state();
     }
 
     @Override
@@ -82,7 +80,7 @@ public class DebitAccount implements Account {
 
     @Override
     public String getAccountTypeName() {
-        return accountTypeName;
+        return "debit";
     }
 
     @Override
@@ -92,6 +90,8 @@ public class DebitAccount implements Account {
 
     @Override
     public void update(String message) {
-        state = owner.hasFullInfo() ? new AccountState.ActiveState() : new AccountState.SuspiciousState();
+        if (owner.hasFullInfo()) {
+            state = new AccountState.ActiveState();
+        }
     }
 }

@@ -1,6 +1,10 @@
 package Banking.Parsing;
 
 import Banking.Commands.Command;
+import Banking.Parsing.BankOperations.*;
+import Banking.Parsing.ClientOperations.*;
+import Banking.Parsing.Notifications.SubscribeCommandHandler;
+import Banking.Parsing.Notifications.UnsubscribeCommandHandler;
 
 public class Parser {
     private final CommandHandler handlerChain;
@@ -12,11 +16,12 @@ public class Parser {
         CommandHandler transferHandler = new TransferCommandHandler();
         CommandHandler createAccountHandler = new CreateAccountCommandHandler();
         CommandHandler createClientHandler = new CreateClientCommandHandler();
-        CommandHandler notificationHandler = new NotificationSubscribtionCommandHandler();
+        CommandHandler notificationHandler = new SubscribeCommandHandler();
         CommandHandler addAddressHandler = new AddAddressCommandHandler();
         CommandHandler addPassportHandler = new AddPassportCommandHandler();
         CommandHandler timeSkipHandler = new TimeSkipCommandHandler();
-
+        CommandHandler changeBankConditions = new ChangeBankConditionsCommandHandler();
+        CommandHandler unsubscribeHandler = new UnsubscribeCommandHandler();
         withdrawHandler.setNext(depositHandler)
                 .setNext(transferHandler)
                 .setNext(createAccountHandler)
@@ -24,7 +29,9 @@ public class Parser {
                 .setNext(notificationHandler)
                 .setNext(addAddressHandler)
                 .setNext(addPassportHandler)
-                .setNext(timeSkipHandler);
+                .setNext(timeSkipHandler)
+                .setNext(changeBankConditions)
+                .setNext(unsubscribeHandler);
 
         this.handlerChain = withdrawHandler;
     }

@@ -1,9 +1,10 @@
-package Banking.Parsing;
+package Banking.Parsing.BankOperations;
 
 import Banking.Accounts.Account;
 import Banking.CentralBank;
-import Banking.Commands.DepositCommand;
+import Banking.Commands.BankOperations.DepositCommand;
 import Banking.Commands.Command;
+import Banking.Parsing.CommandHandlerBase;
 
 import java.math.BigDecimal;
 import java.util.UUID;

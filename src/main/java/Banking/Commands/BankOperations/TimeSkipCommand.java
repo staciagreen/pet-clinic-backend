@@ -1,6 +1,7 @@
-package Banking.Commands;
+package Banking.Commands.BankOperations;
 
 import Banking.CentralBank;
+import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
 public class TimeSkipCommand implements Command {
@@ -12,7 +13,6 @@ public class TimeSkipCommand implements Command {
 
     @Override
     public void execute(IPrinter printer) {
-        // Симуляция ускорения времени: уведомляем банки о необходимости начислений
         CentralBank.getInstance().notifyBanksForPeriodUpdate(days);
         printer.print("Time skipped by " + days + " day(s).");
     }

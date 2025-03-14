@@ -15,7 +15,6 @@ public class Bank extends ObservableEntity {
     private BigDecimal creditLimit;
     private List<Client> clients;
     private List<Account> accounts;
-    // Можно добавить список транзакций для истории
 
     public Bank(String name, BigDecimal interestRate, BigDecimal creditCommission, BigDecimal creditLimit, BigDecimal transferLimit) {
         this.name = name;
@@ -54,6 +53,11 @@ public class Bank extends ObservableEntity {
         notifyObservers("Transfer limit updated");
     }
 
+    public void setCreditLimit(BigDecimal newCreditLimit) {
+        this.creditLimit = newCreditLimit;
+        notifyObservers("Credit limit updated");
+    }
+
     public String getName() {
         return name;
     }
@@ -82,4 +86,6 @@ public class Bank extends ObservableEntity {
         }
         return null;
     }
+
+
 }

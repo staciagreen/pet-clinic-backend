@@ -1,6 +1,7 @@
 package Banking.History;
 
 import Banking.Accounts.AccountSnapshot;
+import Banking.Printers.IPrinter;
 
 import java.util.Stack;
 
@@ -18,11 +19,10 @@ public class OperationHistory {
         return null;
     }
 
-    public void showHistory() {
-        System.out.println("Operation History:");
+    public void showHistory(IPrinter printer) {
+        printer.print("Operation History:");
         for (AccountSnapshot snapshot : snapshots) {
-            System.out.println("Account: " + snapshot.getAccountId() +
-                    ", Balance: " + snapshot.getBalance());
+            printer.print("Account: " + snapshot.accountId() + ", Balance: " + snapshot.balance());
         }
     }
 }

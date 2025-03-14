@@ -14,10 +14,8 @@ public class CreditAccount implements Account {
     private final UUID id;
     private final Client owner;
     private AccountState state;
-    private final List<Command> transactionHistory;
     private final Bank bank;
     private BigDecimal balance;
-    private final String accountTypeName = "credit";
     private final CreditCommissionStrategy commissionStrategy;
     private final BigDecimal creditLimit;
 
@@ -26,7 +24,7 @@ public class CreditAccount implements Account {
         this.owner = owner;
         this.bank = bank;
         this.balance = BigDecimal.ZERO;
-        this.transactionHistory = new ArrayList<>();
+        List<Command> transactionHistory = new ArrayList<>();
         this.state = owner.hasFullInfo() ? new AccountState.ActiveState() : new AccountState.SuspiciousState();
         owner.addAccount(this);
         this.creditLimit = bank.getCreditLimit();
@@ -53,6 +51,17 @@ public class CreditAccount implements Account {
     }
 
     @Override
+    public AccountSnapshot createSnapshot() {
+        return new AccountSnapshot(this.id, this.balance, this.state);
+    }
+
+    @Override
+    public void restoreSnapshot(AccountSnapshot snapshot) {
+        this.balance = snapshot.balance();
+        this.state = snapshot.state();
+    }
+
+    @Override
     public UUID getId() {
         return id;
     }
@@ -69,7 +78,7 @@ public class CreditAccount implements Account {
 
     @Override
     public String getAccountTypeName() {
-        return accountTypeName;
+        return "credit";
     }
 
     @Override
@@ -84,6 +93,8 @@ public class CreditAccount implements Account {
 
     @Override
     public void update(String message) {
-        state = owner.hasFullInfo() ? new AccountState.ActiveState() : new AccountState.SuspiciousState();
+        if (owner.hasFullInfo()) {
+            state = new AccountState.ActiveState();
+        }
     }
 }

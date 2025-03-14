@@ -1,10 +1,11 @@
-package Banking.Parsing;
+package Banking.Parsing.ClientOperations;
 
 import Banking.Bank;
 import Banking.CentralBank;
 import Banking.Client;
-import Banking.Commands.AddAddressCommand;
+import Banking.Commands.ClientOperations.AddAddressCommand;
 import Banking.Commands.Command;
+import Banking.Parsing.CommandHandlerBase;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

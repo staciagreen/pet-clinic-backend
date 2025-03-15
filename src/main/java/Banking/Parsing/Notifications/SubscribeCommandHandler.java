@@ -7,9 +7,21 @@ import Banking.Commands.Command;
 import Banking.Commands.Notifications.SubscribeCommand;
 import Banking.Parsing.CommandHandlerBase;
 
+/**
+ * Обработчик команды подписки на уведомления.
+ * Обрабатывает команду в формате: subscribe [clientName] [bankName].
+ */
 public class SubscribeCommandHandler extends CommandHandlerBase {
+    /**
+     * Обрабатывает входящую строку и возвращает команду подписки на уведомления,
+     * если строка соответствует формату команды.
+     *
+     * @param input входящая строка для обработки
+     * @return объект команды {@link SubscribeCommand}, если строка соответствует формату, иначе передает запрос следующему обработчику
+     */
+    @Override
     public Command handle(String input) {
-        // Формат: subscribe <clientName> <bankName>
+        // Формат: subscribe [clientName] [bankName]
         String[] parts = input.split(" ");
         if (parts.length == 3 && parts[0].equalsIgnoreCase("subscribe")) {
             String clientName = parts[1];

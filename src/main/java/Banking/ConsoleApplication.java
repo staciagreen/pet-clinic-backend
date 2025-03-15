@@ -7,6 +7,9 @@ import Banking.Commands.Command;
 
 import java.util.Scanner;
 
+/**
+ * Консольное приложение для работы с банковской системой.
+ */
 public class ConsoleApplication {
     private final CentralBank centralBank;
     private final IPrinter printer;
@@ -18,6 +21,9 @@ public class ConsoleApplication {
         parser = new Parser();
     }
 
+    /**
+     * Запускает консольное приложение.
+     */
     public void run() {
         Scanner scanner = new Scanner(System.in);
         printer.print("Welcome to the Banking Application");

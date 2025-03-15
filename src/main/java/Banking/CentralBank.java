@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Класс, представляющий центральный банк.
+ */
 public class CentralBank {
     private static CentralBank instance;
     private List<Bank> banks;
@@ -16,6 +19,11 @@ public class CentralBank {
         banks = new ArrayList<>();
     }
 
+    /**
+     * Возвращает единственный экземпляр CentralBank (реализация Singleton).
+     *
+     * @return экземпляр CentralBank
+     */
     public static CentralBank getInstance() {
         if (instance == null) {
             instance = new CentralBank();
@@ -23,14 +31,30 @@ public class CentralBank {
         return instance;
     }
 
+    /**
+     * Возвращает историю операций.
+     *
+     * @return история операций
+     */
     public OperationHistory getOperationHistory() {
         return operationHistory;
     }
 
+    /**
+     * Регистрирует новый банк в центральном банке.
+     *
+     * @param bank банк для регистрации
+     */
     public void registerBank(Bank bank) {
         banks.add(bank);
     }
 
+    /**
+     * Находит банк по названию.
+     *
+     * @param bankName название банка
+     * @return найденный банк или null, если банк не найден
+     */
     public Bank findBankByName(String bankName) {
         for (Bank bank : banks) {
             if (bank.getName().equalsIgnoreCase(bankName)) {
@@ -40,6 +64,12 @@ public class CentralBank {
         return null;
     }
 
+    /**
+     * Находит счет по идентификатору.
+     *
+     * @param accountId идентификатор счета
+     * @return найденный счет или null, если счет не найден
+     */
     public Account findAccountByID(UUID accountId) {
         for (Bank bank : banks) {
             for (Account account : bank.getAccounts()) {
@@ -51,6 +81,11 @@ public class CentralBank {
         return null;
     }
 
+    /**
+     * Уведомляет банки о пропуске времени.
+     *
+     * @param days количество дней для пропуска
+     */
     public void notifyBanksForPeriodUpdate(int days) {
         for (Bank bank : banks) {
             for (var account : bank.getAccounts()) {
@@ -67,6 +102,9 @@ public class CentralBank {
         }
     }
 
+    /**
+     * Очищает список всех банков.
+     */
     public void clearAllBanks() {
         banks.clear();
     }

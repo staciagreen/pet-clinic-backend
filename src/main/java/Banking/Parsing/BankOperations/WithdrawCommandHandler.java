@@ -9,10 +9,21 @@ import Banking.Parsing.CommandHandlerBase;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Обработчик команды для снятия средств со счета.
+ * Обрабатывает команду в формате: withdraw [accountID] [amount].
+ */
 public class WithdrawCommandHandler extends CommandHandlerBase {
+    /**
+     * Обрабатывает входящую строку и возвращает команду снятия средств,
+     * если строка соответствует формату команды.
+     *
+     * @param input входящая строка для обработки
+     * @return объект команды {@link WithdrawCommand}, если строка соответствует формату, иначе передает запрос следующему обработчику
+     */
     @Override
     public Command handle(String input) {
-        // Формат: withdraw <accountID> <amount>
+        // Формат: withdraw [accountID] [amount]
         String[] parts = input.split(" ");
         if (parts.length == 3 && parts[0].equalsIgnoreCase("withdraw")) {
             UUID accountID;

@@ -7,15 +7,29 @@ import Banking.CentralBank;
 
 import java.math.BigDecimal;
 
+/**
+ * Команда для снятия средств со счета.
+ */
 public class WithdrawCommand implements Command {
     private final Account account;
     private final BigDecimal amount;
 
+    /**
+     * Конструктор команды.
+     *
+     * @param account счет, с которого снимаются средства
+     * @param amount сумма для снятия
+     */
     public WithdrawCommand(Account account, BigDecimal amount) {
         this.account = account;
         this.amount = amount;
     }
 
+    /**
+     * Выполняет команду снятия средств со счета.
+     *
+     * @param printer принтер для вывода результатов выполнения команды
+     */
     @Override
     public void execute(IPrinter printer) {
         try {

@@ -9,23 +9,28 @@ import Banking.Parsing.CommandHandlerBase;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Обработчик команды для пополнения счета.
+ */
 public class DepositCommandHandler extends CommandHandlerBase {
+    /**
+     * Обрабатывает входящую строку и возвращает команду пополнения счета.
+     *
+     * @param input входящая строка для обработки
+     * @return объект команды DepositCommand, если строка соответствует формату, иначе передает запрос следующему обработчику
+     */
     @Override
     public Command handle(String input) {
-        // Формат: deposit <accountID> <amount>
+        // Формат: deposit [accountID] [amount]
         String[] parts = input.split(" ");
         if (parts.length == 3 && parts[0].equalsIgnoreCase("deposit")) {
-            String accountStr = parts[1];
-            String amountStr = parts[2];
-
             UUID accountID;
             try {
-                accountID = UUID.fromString(accountStr);
+                accountID = UUID.fromString(parts[1]);
             } catch (IllegalArgumentException e) {
                 return super.handle(input);
             }
-
-            BigDecimal amount = new BigDecimal(amountStr);
+            BigDecimal amount = new BigDecimal(parts[2]);
             Account account = CentralBank.getInstance().findAccountByID(accountID);
             if (account != null) {
                 return new DepositCommand(account, amount);

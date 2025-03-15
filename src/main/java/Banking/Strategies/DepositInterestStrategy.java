@@ -3,7 +3,16 @@ package Banking.Strategies;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * Стратегия для расчета процентов по депозитному счету.
+ */
 public class DepositInterestStrategy implements InterestStrategy {
+    /**
+     * Рассчитывает ежедневные проценты на основе текущего баланса.
+     *
+     * @param currentBalance текущий баланс
+     * @return сумма начисленных процентов
+     */
     @Override
     public BigDecimal calculateInterest(BigDecimal currentBalance) {
         BigDecimal rate;

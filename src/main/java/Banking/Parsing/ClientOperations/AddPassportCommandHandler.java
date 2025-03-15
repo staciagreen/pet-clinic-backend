@@ -7,10 +7,22 @@ import Banking.Commands.ClientOperations.AddPassportCommand;
 import Banking.Commands.Command;
 import Banking.Parsing.CommandHandlerBase;
 
+/**
+ * Обработчик команды добавления паспортных данных клиента.
+ * Обрабатывает команду в формате: setpassport [clientName] [bankName] [newPassport].
+ */
 public class AddPassportCommandHandler extends CommandHandlerBase {
+
+    /**
+     * Обрабатывает входящую строку и возвращает команду добавления паспортных данных клиента,
+     * если строка соответствует формату команды.
+     *
+     * @param input входящая строка для обработки
+     * @return объект команды {@link AddPassportCommand}, если строка соответствует формату, иначе передает запрос следующему обработчику
+     */
     @Override
     public Command handle(String input) {
-        // Формат: setpassport <clientName> <bankName> <newPassport>
+        // Формат: setpassport [clientName] [bankName] [newPassport]
         String[] parts = input.split(" ", 4);
         if (parts.length >= 4 && parts[0].equalsIgnoreCase("setpassport")) {
             String clientName = parts[1];
@@ -28,4 +40,3 @@ public class AddPassportCommandHandler extends CommandHandlerBase {
         return super.handle(input);
     }
 }
-

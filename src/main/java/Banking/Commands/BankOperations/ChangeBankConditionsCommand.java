@@ -6,6 +6,9 @@ import Banking.Printers.IPrinter;
 
 import java.math.BigDecimal;
 
+/**
+ * Команда для изменения условий банка.
+ */
 public class ChangeBankConditionsCommand implements Command {
     private final Bank bank;
     private final BigDecimal newInterestRate;
@@ -13,6 +16,15 @@ public class ChangeBankConditionsCommand implements Command {
     private final BigDecimal newTransferLimit;
     private final BigDecimal newCreditLimit;
 
+    /**
+     * Конструктор команды.
+     *
+     * @param bank банк, условия которого изменяются
+     * @param newInterestRate новая процентная ставка
+     * @param newCreditCommission новая комиссия за кредит
+     * @param newTransferLimit новый лимит на переводы
+     * @param newCreditLimit новый кредитный лимит
+     */
     public ChangeBankConditionsCommand(Bank bank, BigDecimal newInterestRate, BigDecimal newCreditCommission,
                                        BigDecimal newTransferLimit, BigDecimal newCreditLimit) {
         this.bank = bank;
@@ -22,6 +34,11 @@ public class ChangeBankConditionsCommand implements Command {
         this.newCreditLimit = newCreditLimit;
     }
 
+    /**
+     * Выполняет команду изменения условий банка.
+     *
+     * @param printer принтер для вывода результатов выполнения команды
+     */
     @Override
     public void execute(IPrinter printer) {
         bank.setInterestRate(newInterestRate);

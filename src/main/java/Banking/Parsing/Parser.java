@@ -6,9 +6,17 @@ import Banking.Parsing.ClientOperations.*;
 import Banking.Parsing.Notifications.SubscribeCommandHandler;
 import Banking.Parsing.Notifications.UnsubscribeCommandHandler;
 
+/**
+ * Класс, отвечающий за разбор и обработку входящих команд.
+ * Использует цепочку обязанностей (Chain of Responsibility) для обработки команд.
+ */
 public class Parser {
     private final CommandHandler handlerChain;
 
+    /**
+     * Конструктор класса Parser.
+     * Инициализирует цепочку обработчиков команд.
+     */
     public Parser() {
         // Формирование цепочки обработчиков команд
         CommandHandler withdrawHandler = new WithdrawCommandHandler();
@@ -22,6 +30,8 @@ public class Parser {
         CommandHandler timeSkipHandler = new TimeSkipCommandHandler();
         CommandHandler changeBankConditions = new ChangeBankConditionsCommandHandler();
         CommandHandler unsubscribeHandler = new UnsubscribeCommandHandler();
+
+        // Установка цепочки обработчиков
         withdrawHandler.setNext(depositHandler)
                 .setNext(transferHandler)
                 .setNext(createAccountHandler)
@@ -36,6 +46,12 @@ public class Parser {
         this.handlerChain = withdrawHandler;
     }
 
+    /**
+     * Разбирает входящую строку и возвращает соответствующую команду.
+     *
+     * @param input входящая строка для разбора
+     * @return объект команды, соответствующей входящей строке
+     */
     public Command parse(String input) {
         return handlerChain.handle(input);
     }

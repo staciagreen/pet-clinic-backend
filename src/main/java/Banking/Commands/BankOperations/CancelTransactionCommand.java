@@ -6,7 +6,15 @@ import Banking.CentralBank;
 import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
+/**
+ * Команда для отмены последней операции.
+ */
 public class CancelTransactionCommand implements Command {
+    /**
+     * Выполняет команду отмены последней операции.
+     *
+     * @param printer принтер для вывода результатов выполнения команды
+     */
     @Override
     public void execute(IPrinter printer) {
         AccountSnapshot snapshot = CentralBank.getInstance().getOperationHistory().undo();

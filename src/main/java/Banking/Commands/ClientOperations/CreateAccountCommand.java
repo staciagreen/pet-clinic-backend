@@ -9,17 +9,32 @@ import Banking.Client;
 import Banking.Commands.Command;
 import Banking.Printers.IPrinter;
 
+/**
+ * Команда для создания нового счета для клиента.
+ */
 public class CreateAccountCommand implements Command {
     private final Client client;
     private final String accountType;
     private final Bank bank;
 
+    /**
+     * Конструктор команды.
+     *
+     * @param client клиент, для которого создается счет
+     * @param accountType тип счета (debit, deposit, credit)
+     * @param bank банк, в котором создается счет
+     */
     public CreateAccountCommand(Client client, String accountType, Bank bank) {
         this.client = client;
         this.accountType = accountType;
         this.bank = bank;
     }
 
+    /**
+     * Выполняет команду создания счета.
+     *
+     * @param printer принтер для вывода результатов выполнения команды
+     */
     @Override
     public void execute(IPrinter printer) {
         Account account = null;

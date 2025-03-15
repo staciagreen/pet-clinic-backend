@@ -10,13 +10,28 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Обработчик команды изменения условий банка.
+ * Обрабатывает команду в формате: setconditions [bankName] -interest [interestRate] -creditCommission [creditCommission]
+ * -transferLimit [transferLimit] -creditLimit [creditLimit].
+ */
 public class ChangeBankConditionsCommandHandler extends CommandHandlerBase {
-    // Формат: setconditions <bankName> -interest <interestRate> -creditCommission <creditCommission>
-    //          -transferLimit <transferLimit> -creditLimit <creditLimit>
+    /**
+     * Регулярное выражение для разбора команды изменения условий банка.
+     * Формат: setconditions [bankName] -interest [interestRate] -creditCommission [creditCommission]
+     * -transferLimit [transferLimit] -creditLimit [creditLimit].
+     */
     private static final Pattern COMMAND_PATTERN = Pattern.compile(
             "(?i)^setconditions\\s+(\\S+)\\s+-interest\\s+(\\S+)\\s+-creditCommission\\s+(\\S+)\\s+-transferLimit\\s+(\\S+)\\s+-creditLimit\\s+(\\S+)\\s*$"
     );
 
+    /**
+     * Обрабатывает входящую строку и возвращает команду изменения условий банка,
+     * если строка соответствует формату команды.
+     *
+     * @param input входящая строка для обработки
+     * @return объект команды {@link ChangeBankConditionsCommand}, если строка соответствует формату, иначе передает запрос следующему обработчику
+     */
     @Override
     public Command handle(String input) {
         Matcher matcher = COMMAND_PATTERN.matcher(input);
@@ -35,4 +50,3 @@ public class ChangeBankConditionsCommandHandler extends CommandHandlerBase {
         return super.handle(input);
     }
 }
-

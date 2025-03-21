@@ -2,24 +2,16 @@ package PetBase;
 
 
 import PetBase.config.HibernateUtil;
-import PetBase.dao.PetDaoImpl;
-import PetBase.entity.Pet;
-import PetBase.service.PetService;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
 public class Main {
     public static void main(String[] args) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        PetDaoImpl petDao = new PetDaoImpl(sessionFactory);
-        PetService petService = new PetService(petDao);
+        Session session = sessionFactory.openSession();
 
-        Pet pet = new Pet();
-        pet.setName("Барсик");
-        pet.setBirthDate("2023-01-01");
-        pet.setBreed("Сиамский");
-        pet.setColor("Белый");
+        System.out.println("Подключились");
 
-        petService.addPet(pet);
-        petService.getAllPets().forEach(p -> System.out.println(p.getName()));
+        session.close();
+        sessionFactory.close();
     }
 }

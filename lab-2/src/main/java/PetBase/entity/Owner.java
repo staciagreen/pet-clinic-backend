@@ -16,5 +16,15 @@ public class Owner {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets;
 
-    // Геттеры и сеттеры
+    public void setName(String ownerName) {
+        name = ownerName;
+    }
+
+    public void setBirthDate(String ownerBirthDate) {
+        ownerBirthDate = ownerBirthDate;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

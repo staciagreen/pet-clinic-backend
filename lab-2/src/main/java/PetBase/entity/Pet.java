@@ -43,4 +43,8 @@ public class Pet {
     public String getName(){
         return name;
     }
+
+    public void setOwner(Owner inOwner) {
+        owner = inOwner;
+    }
 }

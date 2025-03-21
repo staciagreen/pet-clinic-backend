@@ -47,4 +47,24 @@ public class Pet {
     public void setOwner(Owner inOwner) {
         owner = inOwner;
     }
+
+    public String getId() {
+        return String.valueOf(id);
+    }
+
+    public Owner getOwner() {
+        return owner;
+    }
+
+    public void setId(long l) {
+        id = l;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public String getColor() {
+        return color;
+    }
 }

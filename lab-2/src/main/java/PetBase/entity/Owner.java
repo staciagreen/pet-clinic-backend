@@ -1,4 +1,5 @@
 package PetBase.entity;
+
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -21,10 +22,18 @@ public class Owner {
     }
 
     public void setBirthDate(String ownerBirthDate) {
-        ownerBirthDate = ownerBirthDate;
+        birthDate = ownerBirthDate;
+    }
+
+    public void setId(Long ownerId) {
+        id = ownerId;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getId() {
+        return String.valueOf(id);
     }
 }

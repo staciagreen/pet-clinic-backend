@@ -7,6 +7,9 @@ import org.hibernate.Transaction;
 
 import java.util.List;
 
+/**
+ * DAO для работы с сущностью {@link Pet}.
+ */
 public class PetDAO implements GenericDAO<Pet> {
 
     @Override

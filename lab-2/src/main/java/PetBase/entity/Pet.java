@@ -67,4 +67,8 @@ public class Pet {
     public String getColor() {
         return color;
     }
+
+    public String getBirthDate() {
+        return birthDate;
+    }
 }

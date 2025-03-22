@@ -7,8 +7,17 @@ import org.hibernate.Transaction;
 
 import java.util.List;
 
+/**
+ * DAO-реализация для работы с сущностью {@link Owner}.
+ * Обеспечивает CRUD-операции через Hibernate.
+ */
 public class OwnerDAO implements GenericDAO<Owner> {
 
+    /**
+     * Сохраняет владельца в базе данных.
+     * @param owner объект владельца
+     * @return сохранённый объект
+     */
     @Override
     public Owner save(Owner owner) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -19,6 +28,10 @@ public class OwnerDAO implements GenericDAO<Owner> {
         }
     }
 
+    /**
+     * Удаляет владельца по его ID.
+     * @param id идентификатор владельца
+     */
     @Override
     public void deleteById(Long id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -29,6 +42,10 @@ public class OwnerDAO implements GenericDAO<Owner> {
         }
     }
 
+    /**
+     * Удаляет владельца по объекту.
+     * @param owner объект владельца
+     */
     @Override
     public void deleteByEntity(Owner owner) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -38,6 +55,9 @@ public class OwnerDAO implements GenericDAO<Owner> {
         }
     }
 
+    /**
+     * Удаляет всех владельцев из базы данных.
+     */
     @Override
     public void deleteAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -47,6 +67,11 @@ public class OwnerDAO implements GenericDAO<Owner> {
         }
     }
 
+    /**
+     * Обновляет данные владельца.
+     * @param owner обновлённый объект владельца
+     * @return обновлённый владелец
+     */
     @Override
     public Owner update(Owner owner) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -57,6 +82,11 @@ public class OwnerDAO implements GenericDAO<Owner> {
         }
     }
 
+    /**
+     * Получает владельца по ID.
+     * @param id идентификатор владельца
+     * @return объект владельца или null, если не найден
+     */
     @Override
     public Owner getById(Long id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -64,6 +94,10 @@ public class OwnerDAO implements GenericDAO<Owner> {
         }
     }
 
+    /**
+     * Получает список всех владельцев.
+     * @return список объектов владельцев
+     */
     @Override
     public List<Owner> getAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

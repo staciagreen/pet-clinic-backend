@@ -1,28 +1,27 @@
 package PetBase.service;
 
 import PetBase.dao.PetDAO;
-import PetBase.entity.Owner;
-import PetBase.entity.Pet;
+import PetBase.dao.entity.Owner;
+import PetBase.dao.entity.Pet;
+import PetBase.service.dto.OwnerDTO;
+import PetBase.service.dto.PetDTO;
+import PetBase.service.mapping.OwnerMapper;
+import PetBase.service.mapping.PetMapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * Сервис для работы с питомцами.
- * Инкапсулирует бизнес-логику и обращается к {@link PetDAO}.
- */
 public class PetService {
-    private PetDAO petDAO = new PetDAO();
+    private PetDAO petDAO;
 
-    /**
-     * Создаёт нового питомца и сохраняет его в базу данных.
-     *
-     * @param name      имя питомца
-     * @param birthDate дата рождения
-     * @param breed     порода
-     * @param color     цвет
-     * @param owner     владелец
-     * @return созданный питомец
-     */
+    public PetService() {
+        petDAO = new PetDAO();
+    }
+
+    public PetService(PetDAO petDAO) {
+        this.petDAO = petDAO;
+    }
+
     public Pet createPet(String name, String birthDate, String breed, String color, Owner owner) {
         Pet pet = new Pet();
         pet.setName(name);
@@ -33,57 +32,38 @@ public class PetService {
         return petDAO.save(pet);
     }
 
-    /**
-     * Возвращает всех питомцев из базы данных.
-     *
-     * @return список питомцев
-     */
-    public List<Pet> getAllPets() {
-        return petDAO.getAll();
-    }
-
-    /**
-     * Получает питомца по его ID.
-     *
-     * @param id идентификатор питомца
-     * @return найденный питомец или {@code null}
-     */
     public Pet getPetById(Long id) {
         return petDAO.getById(id);
     }
 
-    /**
-     * Удаляет питомца по его ID.
-     *
-     * @param id идентификатор питомца
-     */
     public void deletePetById(Long id) {
         petDAO.deleteById(id);
     }
 
-    /**
-     * Обновляет данные питомца.
-     *
-     * @param updatedPet обновлённый объект питомца
-     * @return обновлённый питомец
-     */
+    public void deletePetByEntity(Pet pet) {
+        petDAO.deleteByEntity(pet);
+    }
+
     public Pet updatePet(Pet updatedPet) {
         return petDAO.update(updatedPet);
     }
 
-    /**
-     * Конструктор по умолчанию.
-     */
-    public PetService() {
-        this.petDAO = new PetDAO();
+    public void addFriendship(Long petId, Long friendId) {
+        Pet pet = petDAO.getById(petId);
+        Pet friend = petDAO.getById(friendId);
+        if (pet == null || friend == null) return;
+        if (!pet.getFriends().contains(friend)) {
+            pet.getFriends().add(friend);
+            friend.getFriends().add(pet);
+        }
+        petDAO.update(pet);
+        petDAO.update(friend);
     }
 
-    /**
-     * Конструктор с внедрением DAO (используется в тестах).
-     *
-     * @param petDAO DAO для работы с питомцами
-     */
-    public PetService(PetDAO petDAO) {
-        this.petDAO = petDAO;
+    public List<PetDTO> getAllPets() {
+        return petDAO.getAll()
+                .stream()
+                .map(PetMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

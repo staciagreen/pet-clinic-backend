@@ -1,7 +1,12 @@
 package PetBase;
 
-import PetBase.commands.*;
-import PetBase.parsing.*;
+import PetBase.controller.commands.Command;
+import PetBase.controller.commands.owner.CreateOwnerCommand;
+import PetBase.controller.commands.owner.ListOwnersCommand;
+import PetBase.controller.commands.pet.CreatePetCommand;
+import PetBase.controller.commands.pet.DeletePetCommand;
+import PetBase.controller.commands.pet.ListPetsCommand;
+import PetBase.controller.parsing.Parser;
 import PetBase.service.OwnerService;
 import PetBase.service.PetService;
 import org.junit.jupiter.api.Test;
@@ -27,7 +32,7 @@ public class ParserTests {
         ownerService = mock(OwnerService.class);
         petService = mock(PetService.class);
 
-        // Просто обычный сканнер, он не используется, но нужен для конструктора
+        // не используется, но нужен для конструктора
         scanner = new Scanner(System.in);
 
         parser = new Parser(ownerService, petService, scanner);

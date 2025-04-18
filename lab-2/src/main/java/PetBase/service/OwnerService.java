@@ -1,56 +1,50 @@
 package PetBase.service;
 
-import PetBase.service.dto.OwnerDTO;
-import PetBase.dao.OwnerDAO;
+import PetBase.dao.Repository.OwnerRepository;
 import PetBase.dao.entity.Owner;
+import PetBase.service.dto.OwnerDTO;
 import PetBase.service.mapping.OwnerMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class OwnerService {
-    private OwnerDAO ownerDAO;
 
-    public OwnerService() {
-        ownerDAO = new OwnerDAO();
-    }
-    public OwnerService(OwnerDAO ownerDAO) {
-        this.ownerDAO = ownerDAO;
+    private final OwnerRepository ownerRepository;
+
+    @Autowired
+    public OwnerService(OwnerRepository ownerRepository) {
+        this.ownerRepository = ownerRepository;
     }
 
     public OwnerDTO createOwner(String name, String birthDate) {
         Owner owner = new Owner();
         owner.setName(name);
         owner.setBirthDate(birthDate);
-        Owner saved = ownerDAO.save(owner);
-        return OwnerMapper.toDto(saved);
+        return OwnerMapper.toDto(ownerRepository.save(owner));
     }
 
-
     public Owner getOwnerById(Long id) {
-        return ownerDAO.getById(id); // для использования в createPet и т.д.
+        return ownerRepository.findById(id).orElse(null);
     }
 
     public void deleteOwnerById(Long id) {
-        ownerDAO.deleteById(id);
+        ownerRepository.deleteById(id);
     }
 
     public OwnerDTO updateOwner(Owner updatedOwner) {
-        Owner saved = ownerDAO.update(updatedOwner);
-        return OwnerMapper.toDto(saved);
+        return OwnerMapper.toDto(ownerRepository.save(updatedOwner));
     }
 
     public List<OwnerDTO> getAllOwners() {
-        return ownerDAO.getAll()
-                .stream()
+        return ownerRepository.findAll().stream()
                 .map(OwnerMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public OwnerDTO getOwnerDtoById(Long id) {
-        Owner owner = ownerDAO.getById(id);
-        return OwnerMapper.toDto(owner);
+        return ownerRepository.findById(id).map(OwnerMapper::toDto).orElse(null);
     }
 }

@@ -2,8 +2,6 @@ package PetBase;
 
 import PetBase.controller.commands.pet.CreatePetCommand;
 import PetBase.controller.commands.pet.UpdatePetCommand;
-import PetBase.dao.OwnerDAO;
-import PetBase.dao.PetDAO;
 import PetBase.dao.entity.Owner;
 import PetBase.dao.entity.Pet;
 import PetBase.service.OwnerService;

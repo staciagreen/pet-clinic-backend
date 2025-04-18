@@ -4,10 +4,12 @@ import PetBase.service.dto.OwnerDTO;
 import PetBase.dao.OwnerDAO;
 import PetBase.dao.entity.Owner;
 import PetBase.service.mapping.OwnerMapper;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class OwnerService {
     private OwnerDAO ownerDAO;
 

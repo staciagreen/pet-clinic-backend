@@ -7,10 +7,12 @@ import PetBase.service.dto.OwnerDTO;
 import PetBase.service.dto.PetDTO;
 import PetBase.service.mapping.OwnerMapper;
 import PetBase.service.mapping.PetMapper;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class PetService {
     private PetDAO petDAO;
 

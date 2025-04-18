@@ -2,10 +2,10 @@ package PetBase.dao.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "pets")
 public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,75 +16,81 @@ public class Pet {
     private String breed;
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
+    private Double tailLength; // 👈 новое поле
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
     private Owner owner;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name = "pet_friends",
             joinColumns = @JoinColumn(name = "pet_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    private Set<Pet> friends;
+    private List<Pet> friends = new ArrayList<>();
 
-    public void setName(String petName) {
-        name = petName;
+    public Long getId() {
+        return id;
     }
 
-    public void setBirthDate(String petBirthDate) {
-        birthDate = petBirthDate;
-    }
-
-    public void setBreed(String petBreed) {
-        breed = petBreed;
-    }
-
-    public void setColor(String petColor) {
-        color = petColor;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setOwner(Owner inOwner) {
-        owner = inOwner;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Owner getOwner() {
-        return owner;
-    }
-
-    public void setId(long l) {
-        id = l;
-    }
-
-    public String getBreed() {
-        return breed;
-    }
-
-    public String getColor() {
-        return color;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBirthDate() {
         return birthDate;
     }
 
-    public Set<Pet> getFriends() {
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public Double getTailLength() {
+        return tailLength;
+    }
+
+    public void setTailLength(Double tailLength) {
+        this.tailLength = tailLength;
+    }
+
+    public Owner getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Owner owner) {
+        this.owner = owner;
+    }
+
+    public List<Pet> getFriends() {
         return friends;
     }
 
-    public void setFriends(Set<Pet> friends) {
+    public void setFriends(List<Pet> friends) {
         this.friends = friends;
-    }
-
-    public void addFriend(Pet friend) {
-        this.friends.add(friend);
     }
 }

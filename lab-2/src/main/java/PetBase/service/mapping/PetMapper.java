@@ -11,6 +11,8 @@ public class PetMapper {
                 pet.getBirthDate(),
                 pet.getBreed(),
                 pet.getColor(),
-                pet.getOwner().getName());
+                pet.getTailLength(),
+                pet.getOwner().getName()
+        );
     }
 }

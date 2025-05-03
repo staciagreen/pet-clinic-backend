@@ -63,4 +63,23 @@ public class PetService {
         }
         return petRepository.findAll();
     }
+
+    public Page<PetDTO> filterPets(String color, String breed, String minDate, Pageable pageable) {
+        if (color != null && breed != null && minDate != null) {
+            return petRepository
+                    .findByColorIgnoreCaseAndBreedIgnoreCaseAndBirthDateAfter(color, breed, minDate, pageable)
+                    .map(PetMapper::toDTO);
+        }
+        if (color != null && breed != null) {
+            return petRepository
+                    .findByColorIgnoreCaseAndBreedIgnoreCase(color, breed, pageable)
+                    .map(PetMapper::toDTO);
+        }
+        if (color != null) {
+            return petRepository
+                    .findByColorIgnoreCase(color, pageable)
+                    .map(PetMapper::toDTO);
+        }
+        return petRepository.findAll(pageable).map(PetMapper::toDTO);
+    }
 }

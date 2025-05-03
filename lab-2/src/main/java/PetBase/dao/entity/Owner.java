@@ -19,7 +19,6 @@ public class Owner {
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }

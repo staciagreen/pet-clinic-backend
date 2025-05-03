@@ -16,7 +16,7 @@ public class Pet {
     private String breed;
     private String color;
 
-    private Double tailLength; // 👈 новое поле
+    private Double tailLength;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

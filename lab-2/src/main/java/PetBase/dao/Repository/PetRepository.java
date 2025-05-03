@@ -1,4 +1,4 @@
-﻿package PetBase.dao.Repository;
+package PetBase.dao.Repository;
 
 import PetBase.dao.entity.Pet;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +17,11 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     List<Pet> findByColorIgnoreCaseAndBreedIgnoreCaseAndBirthDateAfter(String color, String breed, String birthDate);
 
     Page<Pet> findAll(Pageable pageable);
+
+    Page<Pet> findByColorIgnoreCase(String color, Pageable pageable);
+
+    Page<Pet> findByColorIgnoreCaseAndBreedIgnoreCase(String color, String breed, Pageable pageable);
+
+    Page<Pet> findByColorIgnoreCaseAndBreedIgnoreCaseAndBirthDateAfter(String color, String breed, String birthDate, Pageable pageable);
 
 }

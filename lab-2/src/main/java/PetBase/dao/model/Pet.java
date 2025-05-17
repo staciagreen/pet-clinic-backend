@@ -1,4 +1,4 @@
-package PetBase.dao.entity;
+package PetBase.dao.model;
 
 import jakarta.persistence.*;
 

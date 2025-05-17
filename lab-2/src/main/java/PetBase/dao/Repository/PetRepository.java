@@ -1,6 +1,6 @@
 package PetBase.dao.Repository;
 
-import PetBase.dao.entity.Pet;
+import PetBase.dao.model.Pet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;

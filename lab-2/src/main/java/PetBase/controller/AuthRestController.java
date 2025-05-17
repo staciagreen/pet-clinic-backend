@@ -1,34 +1,61 @@
 package PetBase.rest;
 
-import PetBase.service.dto.OwnerDTO;
+import PetBase.controller.dto.OwnerDTO;
+import PetBase.controller.mapper.OwnerDtoMapper;
 import PetBase.service.OwnerService;
+import PetBase.service.dto.RegisterRequest;
+import PetBase.service.dto.LoginRequest;
+import PetBase.service.dto.OwnerEntityDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthRestController {
-    private final OwnerService ownerService;
 
-    public AuthRestController(OwnerService ownerService) {
+    private final OwnerService ownerService;
+    private final AuthenticationManager authManager;
+
+    public AuthRestController(OwnerService ownerService,
+                              AuthenticationManager authManager) {
         this.ownerService = ownerService;
+        this.authManager = authManager;
     }
 
-    // Получить данные текущего пользователя
+    /** Регистрация нового пользователя */
+    @PostMapping("/register")
+    public ResponseEntity<OwnerDTO> register(@RequestBody RegisterRequest req) {
+        var svcDto = ownerService.registerNewOwner(
+                req.username(), req.password(), req.name(), req.birthDate());
+        return ResponseEntity.ok(OwnerDtoMapper.toDto(svcDto));
+    }
+
+    /** Вход: проверяем creds и создаём Authentication в контексте */
+    @PostMapping("/login")
+    public ResponseEntity<OwnerEntityDto> login(@RequestBody LoginRequest req) {
+        Authentication auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        OwnerEntityDto me = ownerService.findByUsername(req.username());
+        return ResponseEntity.ok(me);
+    }
+
+    /** Получить данные текущего пользователя */
     @GetMapping("/me")
-    public ResponseEntity<OwnerDTO> getCurrent() {
+    public ResponseEntity<OwnerEntityDto> getCurrent() {
         String username = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
+                .getAuthentication().getName();
         return ResponseEntity.ok(ownerService.findByUsername(username));
     }
 
-    // Завершить сессию (для formLogin/logout)
+    /** Завершение сессии */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        // Spring Security настроит /logout автоматически,
-        // но если нужно – сюда можно кинуть логику.
+        SecurityContextHolder.clearContext();
         return ResponseEntity.noContent().build();
     }
 }

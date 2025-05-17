@@ -20,7 +20,7 @@ public class Application {
     public CommandLineRunner seedAdmin(OwnerRepository ownerRepo, PasswordEncoder encoder) {
         return args -> {
             if (ownerRepo.findByUsername("admin").isEmpty()) {
-                PetBase.dao.entity.Owner admin = new PetBase.dao.entity.Owner();
+                PetBase.dao.model.Owner admin = new PetBase.dao.model.Owner();
                 admin.setUsername("admin");
                 admin.setPassword(encoder.encode("admin"));
                 admin.setRoles(Set.of("ROLE_ADMIN"));

@@ -1,14 +1,18 @@
 package PetBase.controller;
 
-import PetBase.dao.entity.Pet;
+import PetBase.dao.model.Pet;
 import PetBase.service.PetService;
-import PetBase.service.dto.PetDTO;
-import PetBase.dao.entity.Owner;
+import PetBase.service.dto.OwnerEntityDto;
+import PetBase.service.dto.PetEntityDto;
+import PetBase.dao.model.Owner;
 import PetBase.service.OwnerService;
-import PetBase.service.mapping.PetMapper;
+import PetBase.service.mapping.OwnerEntityMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +22,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pets")
+@SecurityRequirement(name = "basicAuth")
 public class PetRestController {
+
     @GetMapping("/paged")
-    public Page<PetDTO> getPagedPets(
+    public Page<PetEntityDto> getPagedPets(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
@@ -38,53 +44,64 @@ public class PetRestController {
     }
 
     @GetMapping
-    public List<PetDTO> getAllPets() {
+    @Operation(summary = "Список всех питомцев", description = "Доступно: USER, ADMIN")
+    public List<PetEntityDto> getAllPets() {
         return petService.getAllPets();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PetDTO> getPetById(@PathVariable Long id) {
-        Pet pet = petService.getPetById(id);
-        if (pet == null) {
+    @Operation(summary = "Детали питомца", description = "Доступно: USER, ADMIN")
+    public ResponseEntity<PetEntityDto> getPetById(@PathVariable Long id) {
+        PetEntityDto dto = petService.getPetById(id);
+        if (dto == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(PetMapper.toDTO(pet));
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
-    public ResponseEntity<PetDTO> createPet(@RequestParam String name,
-                                            @RequestParam String birthDate,
-                                            @RequestParam String breed,
-                                            @RequestParam String color,
-                                            @RequestParam Double tailLength,
-                                            @RequestParam Long ownerId) {
-        Owner owner = ownerService.getOwnerById(ownerId);
+    @Operation(summary = "Создать питомца", description = "Доступно: ADMIN или владелец")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwner(#ownerId)")
+    public ResponseEntity<PetEntityDto> createPet(@RequestParam String name,
+                                                  @RequestParam String birthDate,
+                                                  @RequestParam String breed,
+                                                  @RequestParam String color,
+                                                  @RequestParam Double tailLength,
+                                                  @RequestParam Long ownerId) {
+        OwnerEntityDto owner = ownerService.getOwnerById(ownerId);
         if (owner == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Pet pet = petService.createPet(name, birthDate, breed, color, owner);
-        if (pet == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        pet.setTailLength(tailLength);
-        return ResponseEntity.ok(PetMapper.toDTO(pet));
+        PetEntityDto created = petService.createPet(name, birthDate, breed, color, OwnerEntityMapper.fromEntityDTO(owner));
+        return ResponseEntity.ok(created);
     }
 
-
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить питомца", description = "Доступно: ADMIN или владелец")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isPetOwner(#id)")
     public void deletePet(@PathVariable Long id) {
         petService.deletePetById(id);
     }
 
     @GetMapping("/filter")
-    public Page<PetDTO> filterPets(@RequestParam(required = false) String color,
-                                   @RequestParam(required = false) String breed,
-                                   @RequestParam(required = false) String minDate,
-                                   @RequestParam(defaultValue = "0") int page,
-                                   @RequestParam(defaultValue = "5") int size) {
+    public Page<PetEntityDto> filterPets(@RequestParam(required = false) String color,
+                                         @RequestParam(required = false) String breed,
+                                         @RequestParam(required = false) String minDate,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return petService.filterPets(color, breed, minDate, pageable);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Обновить питомца", description = "Доступно: ADMIN или владелец")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isPetOwner(#id)")
+    public ResponseEntity<PetEntityDto> updatePet(
+            @PathVariable Long id,
+            @RequestBody PetEntityDto dto) {
+
+        PetEntityDto updated = petService.updatePet(id, dto);
+        return ResponseEntity.ok(updated);
     }
 }

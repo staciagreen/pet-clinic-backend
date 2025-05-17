@@ -1,6 +1,6 @@
 package PetBase.security;
 
-import PetBase.dao.entity.Owner;
+import PetBase.dao.model.Owner;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

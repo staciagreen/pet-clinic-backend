@@ -1,11 +1,11 @@
 package PetBase.service;
 
 import PetBase.dao.Repository.OwnerRepository;
-import PetBase.dao.entity.Owner;
-import PetBase.service.dto.OwnerDTO;
-import PetBase.service.dto.PetDTO;
-import PetBase.service.mapping.OwnerMapper;
-import PetBase.service.mapping.PetMapper;
+import PetBase.dao.model.Owner;
+import PetBase.service.dto.OwnerEntityDto;
+import PetBase.service.dto.PetEntityDto;
+import PetBase.service.mapping.OwnerEntityMapper;
+import PetBase.service.mapping.PetEntityMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class OwnerService {
-
     private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -31,95 +30,80 @@ public class OwnerService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Для Spring Security: ищем по username и мапим в DTO.
-     * Бросаем UsernameNotFoundException(String).
-     */
-    public OwnerDTO findByUsername(String username) {
-        return ownerRepository.findByUsername(username)
-                .map(OwnerMapper::toDto)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("Owner not found: " + username));
+    public OwnerEntityDto registerNewOwner(String username, String rawPassword,
+                                           String name, String birthDate) {
+        if (ownerRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        Owner o = new Owner();
+        o.setUsername(username);
+        o.setPassword(passwordEncoder.encode(rawPassword));
+        o.setName(name);
+        o.setBirthDate(birthDate);
+        o.setRoles(Set.of("ROLE_USER"));
+        Owner saved = ownerRepository.save(o);
+        return OwnerEntityMapper.toEntityDto(saved);
     }
 
-    /** Возвращает всех владельцев в виде DTO */
-    public List<OwnerDTO> getAllOwners() {
+    public OwnerEntityDto findByUsername(String username) {
+        Owner o = ownerRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Owner not found: " + username));
+        return OwnerEntityMapper.toEntityDto(o);
+    }
+
+    public List<OwnerEntityDto> getAllOwners() {
         return ownerRepository.findAll().stream()
-                .map(OwnerMapper::toDto)
+                .map(OwnerEntityMapper::toEntityDto)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Фильтрация по имени/дате и постраничный вывод.
-     * Поддерживает любые комбинации параметров.
-     */
-    public Page<OwnerDTO> filterOwners(String name, String birthDate, Pageable pageable) {
+    public Page<OwnerEntityDto> filterOwners(String name, String birthDate, Pageable pageable) {
         if (name != null && birthDate != null) {
             return ownerRepository
                     .findByNameIgnoreCaseContainingAndBirthDateContaining(name, birthDate, pageable)
-                    .map(OwnerMapper::toDto);
+                    .map(OwnerEntityMapper::toEntityDto);
         } else if (name != null) {
             return ownerRepository
                     .findByNameIgnoreCaseContaining(name, pageable)
-                    .map(OwnerMapper::toDto);
+                    .map(OwnerEntityMapper::toEntityDto);
         } else if (birthDate != null) {
             return ownerRepository
                     .findByBirthDateContaining(birthDate, pageable)
-                    .map(OwnerMapper::toDto);
-        } else {
-            return ownerRepository
-                    .findAll(pageable)
-                    .map(OwnerMapper::toDto);
+                    .map(OwnerEntityMapper::toEntityDto);
         }
+        return ownerRepository.findAll(pageable)
+                .map(OwnerEntityMapper::toEntityDto);
     }
 
-    /** DTO-версия поиска по ID (для GET /api/owners/{id}) */
-    public OwnerDTO getOwnerDtoById(Long id) {
+    public OwnerEntityDto getOwnerDtoById(Long id) {
         return ownerRepository.findById(id)
-                .map(OwnerMapper::toDto)
+                .map(OwnerEntityMapper::toEntityDto)
                 .orElse(null);
     }
 
-    /** Сама сущность Owner (для проверки прав и работы с PetRestController) */
-    public Owner getOwnerById(Long id) {
+    public OwnerEntityDto getOwnerById(Long id) {
         return ownerRepository.findById(id)
-                .orElse(null);
-    }
-
-    /**
-     * Создаёт нового владельца.
-     * При необходимости можно расширить сигнатуру, чтобы принимать username/password.
-     */
-    public OwnerDTO createOwner(String name, String birthDate) {
-        Owner owner = new Owner();
-        owner.setName(name);
-        owner.setBirthDate(birthDate);
-        // По умолчанию новый юзер имеет роль USER и простой пароль:
-        owner.setRoles(Set.of("ROLE_USER"));
-        owner.setPassword(passwordEncoder.encode("password123"));
-        Owner saved = ownerRepository.save(owner);
-        return OwnerMapper.toDto(saved);
-    }
-
-    /** Обновление полей существующего владельца */
-    public OwnerDTO updateOwner(Owner updatedOwner) {
-        Owner existing = ownerRepository.findById(updatedOwner.getId())
+                .map(OwnerEntityMapper::toEntityDto)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Owner not found with id: " + updatedOwner.getId()));
-        existing.setName(updatedOwner.getName());
-        existing.setBirthDate(updatedOwner.getBirthDate());
-        // Если передали новый пароль или роли — обновляем их
-        if (updatedOwner.getPassword() != null && !updatedOwner.getPassword().isBlank()) {
-            existing.setPassword(passwordEncoder.encode(updatedOwner.getPassword()));
-        }
-        if (updatedOwner.getRoles() != null) {
-            existing.setRoles(updatedOwner.getRoles());
-        }
-        Owner saved = ownerRepository.save(existing);
-        return OwnerMapper.toDto(saved);
+                        new EntityNotFoundException("Owner not found with id: " + id));
     }
 
-    /** Удаление по ID с проверкой существования */
+    public OwnerEntityDto updateOwner(Long id, OwnerEntityDto dto) {
+        OwnerEntityDto existing = getOwnerById(id);
+        OwnerEntityDto new_owner = new OwnerEntityDto(dto.id(), dto.username(), dto.password(), dto.name(), dto.birthDate(), dto.pets(), dto.roles());
+        return OwnerEntityMapper.toEntityDto(ownerRepository.save(OwnerEntityMapper.fromEntityDTO(new_owner)));
+    }
+
+    public OwnerEntityDto createOwner(String name, String birthDate) {
+        Owner o = new Owner();
+        o.setName(name);
+        o.setBirthDate(birthDate);
+        o.setRoles(Set.of("ROLE_USER"));
+        o.setPassword(passwordEncoder.encode("password123"));
+        Owner saved = ownerRepository.save(o);
+        return OwnerEntityMapper.toEntityDto(saved);
+    }
+
     public void deleteOwnerById(Long id) {
         if (!ownerRepository.existsById(id)) {
             throw new EntityNotFoundException("Owner not found with id: " + id);
@@ -127,21 +111,15 @@ public class OwnerService {
         ownerRepository.deleteById(id);
     }
 
-    /** Удалить всех владельцев */
     public void deleteAllOwners() {
         ownerRepository.deleteAll();
     }
 
-    /**
-     * Список DTO питомцев данного владельца.
-     * Для GET /api/owners/{id}/pets
-     */
-    public List<PetDTO> getPetsOfOwner(Long ownerId) {
-        Owner owner = ownerRepository.findById(ownerId)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Owner not found with id: " + ownerId));
-        return owner.getPets().stream()
-                .map(PetMapper::toDTO)
+    public List<PetEntityDto> getPetsOfOwner(Long ownerId) {
+        Owner o = ownerRepository.findById(ownerId)
+                .orElseThrow(() -> new EntityNotFoundException("Owner not found with id: " + ownerId));
+        return o.getPets().stream()
+                .map(PetEntityMapper::toEntityDto)
                 .collect(Collectors.toList());
     }
 }

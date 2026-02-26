@@ -2,6 +2,7 @@ package PetBase.controller;
 
 import PetBase.controller.dto.OwnerDTO;
 import PetBase.controller.mapper.OwnerDtoMapper;
+import PetBase.exception.ResourceNotFoundException;
 import PetBase.service.OwnerService;
 import PetBase.service.dto.OwnerEntityDto;
 import PetBase.service.dto.PetEntityDto;
@@ -44,7 +45,7 @@ public class OwnerRestController {
     public ResponseEntity<OwnerEntityDto> getOwnerById(@PathVariable Long id) {
         OwnerEntityDto dto = ownerService.getOwnerDtoById(id);
         if (dto == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Owner", "id", id);
         }
         return ResponseEntity.ok(dto);
     }
@@ -61,7 +62,7 @@ public class OwnerRestController {
             return ResponseEntity.badRequest().body(null);
         }
         OwnerEntityDto created = ownerService.createOwner(name, birthDate);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping("/{id}")
@@ -80,7 +81,7 @@ public class OwnerRestController {
                                 @RequestParam String birthDate) {
         OwnerEntityDto owner_old = ownerService.getOwnerById(id);
         if (owner_old == null) {
-            throw new RuntimeException("Owner with id " + id + " not found");
+            throw new ResourceNotFoundException("Owner", "id", id);
         }
         OwnerDTO owner_new = new OwnerDTO(id, username, name, birthDate);
         OwnerEntityDto o = ownerService.updateOwner(id, OwnerDtoMapper.fromDto(owner_new));
@@ -99,14 +100,6 @@ public class OwnerRestController {
         return ownerService.filterOwners(name, birthDate, pageable);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        if (ex.getMessage().contains("not found")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
-    }
-
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllOwners() {
@@ -116,7 +109,7 @@ public class OwnerRestController {
     @GetMapping("/{id}/pets")
     public ResponseEntity<List<PetEntityDto>> getPetsOfOwner(@PathVariable Long id) {
         if (ownerService.getOwnerById(id) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            throw new ResourceNotFoundException("Owner", "id", id);
         }
         return ResponseEntity.ok(ownerService.getPetsOfOwner(id));
     }

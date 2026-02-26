@@ -6,6 +6,7 @@ import PetBase.service.OwnerService;
 import PetBase.service.dto.RegisterRequest;
 import PetBase.service.dto.LoginRequest;
 import PetBase.service.dto.OwnerEntityDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,12 +27,11 @@ public class AuthRestController {
         this.authManager = authManager;
     }
 
-    /** Регистрация нового пользователя */
     @PostMapping("/register")
     public ResponseEntity<OwnerDTO> register(@RequestBody RegisterRequest req) {
         var svcDto = ownerService.registerNewOwner(
                 req.username(), req.password(), req.name(), req.birthDate());
-        return ResponseEntity.ok(OwnerDtoMapper.toDto(svcDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(OwnerDtoMapper.toDto(svcDto));
     }
 
     /** Вход: проверяем creds и создаём Authentication в контексте */

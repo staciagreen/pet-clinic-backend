@@ -1,6 +1,7 @@
 package PetBase.controller;
 
 import PetBase.dao.model.Pet;
+import PetBase.exception.ResourceNotFoundException;
 import PetBase.service.PetService;
 import PetBase.service.dto.OwnerEntityDto;
 import PetBase.service.dto.PetEntityDto;
@@ -54,7 +55,7 @@ public class PetRestController {
     public ResponseEntity<PetEntityDto> getPetById(@PathVariable Long id) {
         PetEntityDto dto = petService.getPetById(id);
         if (dto == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Pet", "id", id);
         }
         return ResponseEntity.ok(dto);
     }
@@ -70,16 +71,17 @@ public class PetRestController {
                                                   @RequestParam Long ownerId) {
         OwnerEntityDto owner = ownerService.getOwnerById(ownerId);
         if (owner == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new ResourceNotFoundException("Owner", "id", ownerId);
         }
 
         PetEntityDto created = petService.createPet(name, birthDate, breed, color, OwnerEntityMapper.fromEntityDTO(owner));
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удалить питомца", description = "Доступно: ADMIN или владелец")
     @PreAuthorize("hasRole('ADMIN') or @securityService.isPetOwner(#id)")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePet(@PathVariable Long id) {
         petService.deletePetById(id);
     }
